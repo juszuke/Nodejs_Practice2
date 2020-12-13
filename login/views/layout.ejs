@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.8.0/css/bulma.min.css">
+  </head>
+  <body>
+    <header>
+      <nav class="navbar is-white" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+          <a class="navbar-item" href="">Title</a>
+        </div>
+      
+        <div class="navbar-menu">
+          <div class="navbar-end">
+            <a class="navbar-item" href="/sign-in">Sign In</a>
+            <a class="navbar-item" href="/sign-up">Sign Up</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <form class="message is-light">
+        <div class="message-header">
+          <p><%= title %></p>
+        </div>
+        <%- body %>
+      </form>
+    </main>
+  </body>
+</html>
