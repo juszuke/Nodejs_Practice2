@@ -1,21 +1,31 @@
 const createError = require('http-errors');
-const path = require('path');
 const express = require('express');
-const logger = require('morgan');
+const path = require('path');
 const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
+const logger = require('morgan');
+const mongoose = require('mongoose');
 const flash = require("connect-flash");
 const session = require('express-session');
 const layouts = require("express-ejs-layouts");
-
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const User = require("./models/user.js");
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const signInRouter = require('./routes/signIn');
 const signUpRouter = require('./routes/signUp');
 
+// mongoDB setup
+mongoose.connect(
+  "mongodb://localhost:27017/user_db", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  } 
+);
+
+// passport setup
 passport.serializeUser(function(user, done) {
   done(null, user.id);
 });
@@ -60,7 +70,7 @@ app.use(cookieParser());
 app.use(flash());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// passport setup
+// passport setup これもよくわからない
 app.use(session({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -72,9 +82,11 @@ app.use('/sign-up', signUpRouter);
 
 // これの使い方がわからない
 app.post('/sign-in',
-  passport.authenticate('local', { successRedirect: '/',
-                                   failureRedirect: '/sign-in',
-                                   failureFlash: true })
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/sign-in',
+    failureFlash: true 
+  })
 );
 
 // catch 404 and forward to error handler
