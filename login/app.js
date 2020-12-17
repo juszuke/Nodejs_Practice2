@@ -1,4 +1,5 @@
-const createError = require('http-errors');
+"use strict";
+
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
@@ -10,16 +11,21 @@ const session = require('express-session');
 const layouts = require("express-ejs-layouts");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const User = require("./models/user.js");
+// const User = require("./models/user.js");
+
+const errorController = require('./controllers/errorController');
+// const userController = require('./controllers/usersController');
+const homeController = require('./controllers/homeController');
 
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-const signInRouter = require('./routes/signIn');
-const signUpRouter = require('./routes/signUp');
+// const usersRouter = require('./routes/users');
+// const signInRouter = require('./routes/signIn');
+// const signUpRouter = require('./routes/signUp');
 
 // mongoDB setup
 mongoose.connect(
   "mongodb://localhost:27017/user_db", {
+    useCreateIndex: true,  
     useNewUrlParser: true,
     useUnifiedTopology: true
   } 
@@ -67,42 +73,23 @@ app.use(layouts);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(flash());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // passport setup これもよくわからない
 app.use(session({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/sign-in', signInRouter);
-app.use('/sign-up', signUpRouter);
+// app.use('/users', usersRouter);
+// app.use('/sign-in', signInRouter);
+// app.use('/sign-up', signUpRouter);
 
-// これの使い方がわからない
-app.post('/sign-in',
-  passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/sign-in',
-    failureFlash: true 
-  })
-);
+app.get("/sign-in", homeController.showSignIn);
+app.get("/sign-up", homeController.showSignUp);
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+app.use(errorController.catch404);
+app.use(errorController.handleError);
 
 module.exports = app;

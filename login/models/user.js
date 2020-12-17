@@ -1,10 +1,23 @@
+"use strict";
+
 const mongoose = require('mongoose');
 
-const UserSchema = mongoose.Schema({
-  email: String,
-  id: String,
-  username: String,
-  password: String
+const UserSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  username: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 7
+  }
 });
 
-exports.User = mongoose.model('User', UserSchema, 'user');
+exports.User = mongoose.model('User', UserSchema);
