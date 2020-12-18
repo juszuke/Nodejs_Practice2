@@ -1,9 +1,8 @@
 <form class="message is-light">
     <div class="message-header">
-        <p>Home</p>
+        <p>Dashboard</p>
     </div>
     <div class="message-body">
-        <p>Yay!!!</p>
+        <p>You are logged in!</p>
     </div>
 </form>
-

@@ -6,15 +6,15 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 const logger = require('morgan');
 const mongoose = require('mongoose');
-const flash = require("connect-flash");
-const session = require('express-session');
+// const flash = require("connect-flash");
+// const session = require('express-session');
 const layouts = require("express-ejs-layouts");
-const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
+// const passport = require("passport");
+// const LocalStrategy = require("passport-local").Strategy;
 // const User = require("./models/user.js");
 
 const errorController = require('./controllers/errorController');
-// const userController = require('./controllers/usersController');
+const usersController = require('./controllers/usersController');
 const homeController = require('./controllers/homeController');
 
 const indexRouter = require('./routes/index');
@@ -31,34 +31,34 @@ mongoose.connect(
   } 
 );
 
-// passport setup
-passport.serializeUser(function(user, done) {
-  done(null, user.id);
-});
+// // passport setup
+// passport.serializeUser(function(user, done) {
+//   done(null, user.id);
+// });
 
-passport.deserializeUser(function(id, done) {
-  User.findById(id, function(err, user) {
-    done(err, user);
-  });
-});
+// passport.deserializeUser(function(id, done) {
+//   User.findById(id, function(err, user) {
+//     done(err, user);
+//   });
+// });
 
-passport.use(new LocalStrategy({
-    usernameField: 'email',
-    passwordField: 'password'
-  },
-  function(username, password, done) {
-    User.findOne({ username: username }, function(err, user) {
-      if (err) { return done(err); }
-      if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
-      }
-      if (!user.validPassword(password)) {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
-      return done(null, user);
-    });
-  }
-));
+// passport.use(new LocalStrategy({
+//     usernameField: 'email',
+//     passwordField: 'password'
+//   },
+//   function(username, password, done) {
+//     User.findOne({ username: username }, function(err, user) {
+//       if (err) { return done(err); }
+//       if (!user) {
+//         return done(null, false, { message: 'Incorrect username.' });
+//       }
+//       if (!user.validPassword(password)) {
+//         return done(null, false, { message: 'Incorrect password.' });
+//       }
+//       return done(null, user);
+//     });
+//   }
+// ));
 
 const app = express();
 
@@ -75,11 +75,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// passport setup これもよくわからない
-app.use(session({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
-app.use(flash());
-app.use(passport.initialize());
-app.use(passport.session());
+// // passport setup これもよくわからない
+// app.use(session({
+//   secret: 'keyboard cat',
+//   resave: true,
+//   saveUninitialized: true
+// }));
+// app.use(flash());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 app.use('/', indexRouter);
 // app.use('/users', usersRouter);
@@ -87,7 +91,11 @@ app.use('/', indexRouter);
 // app.use('/sign-up', signUpRouter);
 
 app.get("/sign-in", homeController.showSignIn);
-app.get("/sign-up", homeController.showSignUp);
+
+app.get("/users", usersController.index, usersController.indexView);
+app.get("/users/new", usersController.new);
+app.post("/users/create", usersController.create, usersController.redirectView);
+app.get("/users/:id", usersController.show, usersController.showView)
 
 app.use(errorController.catch404);
 app.use(errorController.handleError);
