@@ -1,9 +1,7 @@
 "use strict";
 
-exports.showSignIn = (req, res) => {
-  res.render("signIn");
-};
-
-exports.showSignUp = (req, res) => {
-  res.render("signUp");
+module.exports = {
+  index: (req, res) => {
+    res.render("index");
+  }
 };
