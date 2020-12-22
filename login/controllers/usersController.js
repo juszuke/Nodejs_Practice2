@@ -2,7 +2,6 @@
 
 const User = require("../models/user");
 const passport = require("passport");
-// const { check, validationResult } = require('express-validator')
 const getUserParams = body => {
   return {
     username: body.username,
@@ -31,6 +30,7 @@ module.exports = {
     res.render("users/new");
   },
   create: (req, res, next) => {
+    console.log('d')
     if (req.skip) return next();
     let newUser = new User(getUserParams(req.body));
     User.register(newUser, req.body.password, (e, user) => {
@@ -71,34 +71,6 @@ module.exports = {
   showView: (req, res) => {
     res.render("users/show");
   },
-  // エラーになっちゃう
-  // validate: (req, res, next) => {
-  //   check('username')
-  //     .not()
-  //     .isEmpty()
-  //     .withMessage("NAME は必ず入力して下さい");
-  //   check('email')
-  //     .isEmail()
-  //     .trim()
-  //     .normalizeEmail()
-  //     .withMessage("MAIL はメールアドレスを記入して下さい");
-  //   check('password')
-  //     .not()
-  //     .isEmpty()
-  //     .isLength({min: 7})
-  //     .withMessage("Password は7文字以上にしてください");
-  //   check('confirm')
-  //     .custom((value, { req }) => {
-  //       if (value !== req.body.password) {
-  //         throw new Error('Password と Confirm Password が一致していません');
-  //       }
-  //       return true;
-  //     });
-  //   const errors = validationResult(req);
-  //   if (!errors.isEmpty()) {
-  //     return res.status(400).json({ errors: errors.array() });
-  //   };
-  // },
   login: (req, res) => {
     res.render("users/login");
   },

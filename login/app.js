@@ -120,23 +120,23 @@ app.post("/users/create", [
       }
       return true;
     })
-], (req, res) => {
+], (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    let messages = errors.array().map(e => e.msg);
+    req.skip = true;
+    req.flash('error', messages.join(' and '));
+
+    res.locals.redirect = '/users/new';
+    next();
+  } else {
+    next();
   }
 },
   usersController.create,
   usersController.authenticate,
   usersController.redirectView
 );
-// app.post(
-//   "/users/create", 
-//   usersController.validate,
-//   usersController.create,
-//   usersController.authenticate,
-//   usersController.redirectView
-// );
 app.get("/users/login", usersController.login);
 app.post("/users/login", usersController.authenticate);
 app.get("/users/logout", usersController.logout, usersController.redirectView);
