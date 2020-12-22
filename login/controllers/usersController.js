@@ -30,7 +30,6 @@ module.exports = {
     res.render("users/new");
   },
   create: (req, res, next) => {
-    console.log('d')
     if (req.skip) return next();
     let newUser = new User(getUserParams(req.body));
     User.register(newUser, req.body.password, (e, user) => {
