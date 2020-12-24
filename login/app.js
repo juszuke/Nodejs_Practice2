@@ -12,7 +12,6 @@ const passport = require("passport");
 const LocalStrategy = require('passport-local').Strategy;
 const cookieParser = require("cookie-parser");
 const expressSession = require("express-session");
-const { body, validationResult } = require('express-validator')
 const bodyParser = require("body-parser");
 const connectFlash = require("connect-flash");
 const User = require("./models/user");
@@ -96,49 +95,16 @@ app.use((req, res, next) => {
 
 app.get("/", homeController.index);
 
-app.get("/users", usersController.index, usersController.indexView);
+app.get("/users", usersController.getAllUsers, usersController.indexView);
 app.get("/users/new", usersController.new);
-app.post("/users/create", [
-  body('username')
-    .not()
-    .isEmpty()
-    .withMessage("NAME は必ず入力して下さい"),
-  body('email')
-    .isEmail()
-    .trim()
-    .normalizeEmail()
-    .withMessage("MAIL はメールアドレスを記入して下さい"),
-  body('password')
-    .not()
-    .isEmpty()
-    .isLength({min: 7})
-    .withMessage("Password は7文字以上にしてください"),
-  body('confirm')
-    .custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error('Password と Confirm Password が一致していません');
-      }
-      return true;
-    })
-], (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    let messages = errors.array().map(e => e.msg);
-    req.skip = true;
-    req.flash('error', messages.join(' and '));
-
-    res.locals.redirect = '/users/new';
-    next();
-  } else {
-    next();
-  }
-},
+app.post("/users/create", 
+  usersController.validate,
   usersController.create,
   usersController.authenticate,
   usersController.redirectView
 );
-app.get("/users/login", usersController.login);
-app.post("/users/login", usersController.authenticate);
+app.get("/auth/login", usersController.login);
+app.post("/auth/login", usersController.authenticate);
 app.get("/users/logout", usersController.logout, usersController.redirectView);
 app.get("/users", usersController.show, usersController.showView);
 

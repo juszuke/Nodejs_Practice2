@@ -2,6 +2,7 @@
 
 const User = require("../models/user");
 const passport = require("passport");
+const { body, validationResult } = require('express-validator');
 const getUserParams = body => {
   return {
     username: body.username,
@@ -11,7 +12,7 @@ const getUserParams = body => {
 };
 
 module.exports = {
-  index: (req, res, next) => {
+  getAllUsers: (req, res, next) => {
     User.find()
       .then(users => {
         res.locals.users = users;
@@ -22,6 +23,7 @@ module.exports = {
         next(error);
       });
   },
+
   indexView: (req, res) => {
     res.render("users/index");
   },
@@ -29,9 +31,10 @@ module.exports = {
   new: (req, res) => {
     res.render("users/new");
   },
+
   create: (req, res, next) => {
     if (req.skip) return next();
-    let newUser = new User(getUserParams(req.body));
+    const newUser = new User(getUserParams(req.body));
     User.register(newUser, req.body.password, (e, user) => {
       if (user) {
         req.flash(
@@ -50,13 +53,15 @@ module.exports = {
       }
     });
   },
+
   redirectView: (req, res, next) => {
-    let redirectPath = res.locals.redirect;
-    if (redirectPath !== undefined) res.redirect(redirectPath);
+    const redirectPath = res.locals.redirect;
+    if (redirectPath) res.redirect(redirectPath);
     else next();
   },
+
   show: (req, res, next) => {
-    let userId = req.params.id;
+    const userId = req.params.id;
     User.findById(userId)
       .then(user => {
         res.locals.user = user;
@@ -67,22 +72,62 @@ module.exports = {
         next(error);
       });
   },
+
   showView: (req, res) => {
     res.render("users/show");
   },
+
   login: (req, res) => {
-    res.render("users/login");
+    res.render("auth/login");
   },
+
+  validate: (req, res, next) => {
+      body('username')
+      .not()
+      .isEmpty()
+      .withMessage("NAME は必ず入力して下さい");
+    body('email')
+      .isEmail()
+      .trim()
+      .normalizeEmail()
+      .withMessage("MAIL はメールアドレスを記入して下さい");
+    body('password')
+      .not()
+      .isEmpty()
+      .isLength({min: 7})
+      .withMessage("Password は7文字以上にしてください");
+    body('confirm')
+      .custom((value, { req }) => {
+        if (value !== req.body.password) {
+          throw new Error('Password と Confirm Password が一致していません');
+        }
+        return true;
+      })
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const messages = errors.array().map(e => e.msg);
+      req.skip = true;
+      req.flash('error', messages.join(' and '));
+
+      res.locals.redirect = '/users/new';
+      next();
+    } else {
+      next();
+    }
+  },
+
   authenticate: passport.authenticate("local", {
-    failureRedirect: "/users/login",
+    failureRedirect: "/auth/login",
     failureFlash: "Failed to login.",
     successRedirect: "/users",
     successFlash: "Logged in!"
   }),
+
   logout: (req, res, next) => {
     req.logout();
     req.flash("success", "You have been logged out!");
-    res.locals.redirect = "/users/login";
+    res.locals.redirect = "/auth/login";
     next();
   }
 };
