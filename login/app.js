@@ -15,6 +15,7 @@ const expressSession = require("express-session");
 const bodyParser = require("body-parser");
 const connectFlash = require("connect-flash");
 const User = require("./models/user");
+const userValidator = require("./userValidator");
 
 // mongoDB setup
 mongoose.connect(
@@ -97,7 +98,8 @@ app.get("/", homeController.index);
 
 app.get("/users", usersController.getAllUsers, usersController.indexView);
 app.get("/users/new", usersController.new);
-app.post("/users/create", 
+app.post("/users/create",
+  userValidator,
   usersController.validate,
   usersController.create,
   usersController.authenticate,

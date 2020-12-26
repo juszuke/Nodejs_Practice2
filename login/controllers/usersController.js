@@ -2,7 +2,7 @@
 
 const User = require("../models/user");
 const passport = require("passport");
-const { body, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
 const getUserParams = body => {
   return {
     username: body.username,
@@ -82,28 +82,6 @@ module.exports = {
   },
 
   validate: (req, res, next) => {
-      body('username')
-      .not()
-      .isEmpty()
-      .withMessage("NAME は必ず入力して下さい");
-    body('email')
-      .isEmail()
-      .trim()
-      .normalizeEmail()
-      .withMessage("MAIL はメールアドレスを記入して下さい");
-    body('password')
-      .not()
-      .isEmpty()
-      .isLength({min: 7})
-      .withMessage("Password は7文字以上にしてください");
-    body('confirm')
-      .custom((value, { req }) => {
-        if (value !== req.body.password) {
-          throw new Error('Password と Confirm Password が一致していません');
-        }
-        return true;
-      })
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const messages = errors.array().map(e => e.msg);
