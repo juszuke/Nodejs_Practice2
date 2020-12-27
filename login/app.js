@@ -3,9 +3,7 @@
 const express = require("express");
 const layouts = require("express-ejs-layouts");
 const app = express();
-const homeController = require("./controllers/homeController");
-const errorController = require("./controllers/errorController");
-const usersController = require("./controllers/usersController");
+const router = require("./routes/index");
 const mongoose = require("mongoose");
 const methodOverride = require("method-override");
 const passport = require("passport");
@@ -15,7 +13,6 @@ const expressSession = require("express-session");
 const bodyParser = require("body-parser");
 const connectFlash = require("connect-flash");
 const User = require("./models/user");
-const userValidator = require("./userValidator");
 
 // mongoDB setup
 mongoose.connect(
@@ -94,23 +91,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/", homeController.index);
-
-app.get("/users", usersController.getAllUsers, usersController.indexView);
-app.get("/users/new", usersController.new);
-app.post("/users/create",
-  userValidator,
-  usersController.validate,
-  usersController.create,
-  usersController.authenticate,
-  usersController.redirectView
-);
-app.get("/auth/login", usersController.login);
-app.post("/auth/login", usersController.authenticate);
-app.get("/users/logout", usersController.logout, usersController.redirectView);
-app.get("/users", usersController.show, usersController.showView);
-
-app.use(errorController.catch404);
-app.use(errorController.handleError);
+app.use("/", router);
 
 module.exports = app;
