@@ -1,33 +1,33 @@
-"use strict";
+'use strict';
 
 const mongoose = require('mongoose');
-const { Schema } = require("mongoose");
-const passportLocalMongoose = require("passport-local-mongoose");
+const { Schema } = require('mongoose');
+const passportLocalMongoose = require('passport-local-mongoose');
 const userSchema = new Schema(
   {
     username: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
     },
     email: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
     },
     password: {
       type: String,
       required: true,
-      minlength: 7
-    }
-  }, 
+      minlength: 7,
+    },
+  },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
 userSchema.plugin(passportLocalMongoose, {
-  usernameField: "email"
+  usernameField: 'email',
 });
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model('User', userSchema);
