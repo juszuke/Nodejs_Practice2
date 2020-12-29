@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <title>title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.8.0/css/bulma.min.css">
+  </head>
+
+  <body>
+    <header>
+      <nav class="navbar is-white" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+          <a class="navbar-item" href="/users">Title</a>
+        </div>
+        <div class="navbar-menu">
+          <div class="navbar-end">
+            <div class="login">
+              <% if (loggedIn) { %>
+                <div class="navbar-item has-dropdown is-hoverable">
+                  <a class="navbar-link"><%= currentUser.username %></a>
+                  <div class="navbar-dropdown">
+                    <a class="navbar-item" href="/auth/logout">Sign Out</a>
+                  </div>
+                </div> 
+              <%} else {%>
+                <a class="navbar-item" href="/auth/login">Sign In</a>
+                <a class="navbar-item" href="/users/new">Sign Up</a>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="flashes">
+        <% if (flashMessages) { %>
+        <% if (flashMessages.success) { %>
+        <div class="flash success">
+          <%= flashMessages.success %>
+        </div>
+        <% } else if (flashMessages.error) { %>
+        <div class="flash error">
+          <%= flashMessages.error %>
+        </div>
+        <% } %>
+        <% } %>
+      </div>
+    </header>
+
+    <main>
+      <%- body %>
+    </main>
+
+  </body>
+
+</html>

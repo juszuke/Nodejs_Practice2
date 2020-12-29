@@ -1,9 +1,15 @@
+'use strict';
+
 const express = require('express');
 const router = express.Router();
+const authRoutes = require('./authRoutes');
+const errorRoutes = require('./errorRoutes');
+const homeRoutes = require('./homeRoutes');
+const userRoutes = require('./userRoutes');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
+router.use('/', errorRoutes);
+router.use('/', homeRoutes);
 
 module.exports = router;
